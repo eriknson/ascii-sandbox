@@ -29,6 +29,23 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <meta name="mobile-web-app-capable" content="yes" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                  const theme = isDark ? 'dark' : 'light';
+                  const bgColor = isDark ? '#000000' : '#FFFFFF';
+                  document.documentElement.setAttribute('data-theme', theme);
+                  document.documentElement.style.backgroundColor = bgColor;
+                  document.body.setAttribute('data-theme', theme);
+                  document.body.style.backgroundColor = bgColor;
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
       </head>
       <body>{children}</body>
     </html>

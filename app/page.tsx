@@ -67,9 +67,14 @@ export default function Home() {
         // @ts-ignore
         const geometricShapes = new window.GeometricShapes()
 
-            // Set initial theme
-            document.body.setAttribute('data-theme', 'dark')
-            document.body.style.backgroundColor = '#000000'
+            // Detect initial theme from system preference or existing attribute
+            const existingTheme = document.body.getAttribute('data-theme')
+            const isDark = existingTheme === 'dark' || (!existingTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)
+            const initialTheme = isDark ? 'dark' : 'light'
+            const initialBgColor = isDark ? '#000000' : '#FFFFFF'
+            
+            document.body.setAttribute('data-theme', initialTheme)
+            document.body.style.backgroundColor = initialBgColor
             
             // Create app instance
             const app = {
@@ -294,24 +299,25 @@ export default function Home() {
     }
 
     const loadEmoji = (app: any, emoji: string) => {
-      const emojiWidth = Math.min(100, Math.floor(app.renderer.cols * 0.7))
-      const emojiHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
+      const emojiWidth = Math.min(120, Math.floor(app.renderer.cols * 0.8))
+      const emojiHeight = Math.min(100, Math.floor(app.renderer.rows * 0.8))
       app.currentDepthMap = app.converter.create3DDepthMap(emoji, emojiWidth, emojiHeight)
       app.currentShape = null
       app.uploadedImage = null
     }
     
     const loadShape = (app: any, shapeName: string) => {
-      const shapeWidth = Math.min(100, Math.floor(app.renderer.cols * 0.7))
-      const shapeHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
+      const shapeWidth = Math.min(120, Math.floor(app.renderer.cols * 0.8))
+      const shapeHeight = Math.min(100, Math.floor(app.renderer.rows * 0.8))
       app.currentShape = shapeName
       app.uploadedImage = null
       // Shape will be generated each frame for animations
     }
     
     const loadUploadedImage = (app: any, image: any) => {
-      const imgWidth = Math.min(100, Math.floor(app.renderer.cols * 0.7))
-      const imgHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
+      // Use larger dimensions for uploaded images to show more detail
+      const imgWidth = Math.min(150, Math.floor(app.renderer.cols * 0.9))
+      const imgHeight = Math.min(120, Math.floor(app.renderer.rows * 0.9))
       app.currentDepthMap = app.converter.create3DDepthMapFromImage(image, imgWidth, imgHeight)
       app.currentShape = null
       app.uploadedImage = image
@@ -408,6 +414,11 @@ export default function Home() {
         style={{ display: 'none' }}
       />
 
+      {/* Upload Image Button */}
+      <button id="upload-button" className="upload-btn">
+        Upload image
+      </button>
+
       {/* Emoji Keyboard - Optimized for Touch (44x44 minimum) */}
       <div id="emoji-keyboard" className="keyboard-container">
         <div className="keyboard-row keyboard-row-top">
@@ -465,12 +476,6 @@ export default function Home() {
           </button>
         </div>
       </div>
-
-      {/* Upload Image CTA Button */}
-      <button id="upload-button" className="upload-cta">
-        <span className="upload-icon">📸</span>
-        <span className="upload-text">Upload Your Own Image</span>
-      </button>
 
       {/* Settings Panel */}
       <div id="settings-panel" className="settings-panel collapsed">

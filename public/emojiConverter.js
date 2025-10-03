@@ -7,7 +7,7 @@ class EmojiConverter {
     constructor() {
         this.canvas = document.createElement('canvas');
         this.ctx = this.canvas.getContext('2d', { willReadFrequently: true });
-        this.size = 256; // Increased base emoji render size for more detail
+        this.size = 512; // Increased base render size for much more detail
         this.canvas.width = this.size;
         this.canvas.height = this.size;
     }
