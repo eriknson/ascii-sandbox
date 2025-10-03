@@ -136,8 +136,8 @@ export default function Home() {
               loadUploadedImage(app, img)
               app.transition.start()
               
-              // Clear emoji/shape selection
-              const allButtons = document.querySelectorAll('.emoji-key, .shape-key')
+              // Clear emoji selection
+              const allButtons = document.querySelectorAll('.emoji-btn')
               allButtons.forEach(btn => btn.classList.remove('active'))
             }
             img.src = event.target?.result as string
@@ -146,29 +146,8 @@ export default function Home() {
         }
       })
       
-      // Keyboard mode toggles
-      const keyboardToggle = document.getElementById('keyboard-toggle')
-      const keyboardToggleShapes = document.getElementById('keyboard-toggle-shapes')
-      const emojiKeyboard = document.getElementById('emoji-keyboard')
-      const geometricKeyboard = document.getElementById('geometric-keyboard')
-      
-      const switchToGeometric = () => {
-        app.keyboardMode = 'geometric'
-        emojiKeyboard?.classList.add('hidden')
-        geometricKeyboard?.classList.remove('hidden')
-      }
-      
-      const switchToEmoji = () => {
-        app.keyboardMode = 'emoji'
-        emojiKeyboard?.classList.remove('hidden')
-        geometricKeyboard?.classList.add('hidden')
-      }
-      
-      keyboardToggle?.addEventListener('click', switchToGeometric)
-      keyboardToggleShapes?.addEventListener('click', switchToEmoji)
-      
       // Emoji buttons
-      const emojiButtons = document.querySelectorAll('.emoji-key')
+      const emojiButtons = document.querySelectorAll('.emoji-btn')
       emojiButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           const emoji = btn.getAttribute('data-emoji')
@@ -188,45 +167,17 @@ export default function Home() {
         butterflyBtn.classList.add('active')
       }
       
-      // Geometric shape buttons
-      const shapeButtons = document.querySelectorAll('.shape-key')
-      shapeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-          const shape = btn.getAttribute('data-shape')
-          if (shape) {
-            selectShape(app, shape)
-            shapeButtons.forEach(b => b.classList.remove('active'))
-            btn.classList.add('active')
-          }
-        })
-      })
-      
-      // Keyboard shortcuts - Full QWERTY (don't block CMD+R)
+      // Number key shortcuts (1-8)
       document.addEventListener('keydown', (e) => {
-        // Don't intercept CMD/CTRL key combinations (like CMD+R for reload)
+        // Don't intercept CMD/CTRL key combinations
         if (e.metaKey || e.ctrlKey) {
           return
         }
         
-        // Tab to toggle keyboards
-        if (e.key === 'Tab') {
-          e.preventDefault()
-          if (app.keyboardMode === 'emoji') {
-            switchToGeometric()
-          } else {
-            switchToEmoji()
-          }
-          return
-        }
-        
-        // Letter keys - find the matching button
-        const key = e.key.toUpperCase()
-        if (key >= 'A' && key <= 'Z') {
-          const allButtons = app.keyboardMode === 'emoji' 
-            ? document.querySelectorAll('.emoji-key') 
-            : document.querySelectorAll('.shape-key')
-          
-          const targetBtn = Array.from(allButtons).find(btn => 
+        // Number keys 1-8
+        const key = e.key
+        if (key >= '1' && key <= '8') {
+          const targetBtn = Array.from(emojiButtons).find(btn => 
             btn.getAttribute('data-key') === key
           )
           
@@ -435,67 +386,25 @@ export default function Home() {
         style={{ display: 'none' }}
       />
 
-      {/* Upload Image Button */}
-      <button id="upload-button" className="upload-btn">
-        Upload image
-      </button>
-
-      {/* Emoji Keyboard - Optimized for Touch (44x44 minimum) */}
-      <div id="emoji-keyboard" className="keyboard-container">
-        <div className="keyboard-row keyboard-row-top">
-          <button className="key emoji-key" data-emoji="💎" data-key="Q"><span className="emoji">💎</span><span className="key-label">Q</span></button>
-          <button className="key emoji-key" data-emoji="✨" data-key="W"><span className="emoji">✨</span><span className="key-label">W</span></button>
-          <button className="key emoji-key" data-emoji="🌙" data-key="E"><span className="emoji">🌙</span><span className="key-label">E</span></button>
-          <button className="key emoji-key" data-emoji="⭐" data-key="R"><span className="emoji">⭐</span><span className="key-label">R</span></button>
-          <button className="key emoji-key" data-emoji="🌟" data-key="T"><span className="emoji">🌟</span><span className="key-label">T</span></button>
-          <button className="key emoji-key" data-emoji="💫" data-key="Y"><span className="emoji">💫</span><span className="key-label">Y</span></button>
-          <button className="key emoji-key" data-emoji="🔮" data-key="U"><span className="emoji">🔮</span><span className="key-label">U</span></button>
-          <button className="key emoji-key" data-emoji="🦋" data-key="I"><span className="emoji">🦋</span><span className="key-label">I</span></button>
+      {/* Floating Control Panel */}
+      <div className="floating-controls">
+        {/* Emoji Grid */}
+        <div className="emoji-grid">
+          <button className="emoji-btn" data-emoji="🦋" data-key="1"><span className="emoji">🦋</span></button>
+          <button className="emoji-btn" data-emoji="✨" data-key="2"><span className="emoji">✨</span></button>
+          <button className="emoji-btn" data-emoji="🔥" data-key="3"><span className="emoji">🔥</span></button>
+          <button className="emoji-btn" data-emoji="💎" data-key="4"><span className="emoji">💎</span></button>
+          <button className="emoji-btn" data-emoji="🌊" data-key="5"><span className="emoji">🌊</span></button>
+          <button className="emoji-btn" data-emoji="🌙" data-key="6"><span className="emoji">🌙</span></button>
+          <button className="emoji-btn" data-emoji="🎨" data-key="7"><span className="emoji">🎨</span></button>
+          <button className="emoji-btn" data-emoji="⭐" data-key="8"><span className="emoji">⭐</span></button>
         </div>
-        <div className="keyboard-row keyboard-row-middle">
-          <button className="key emoji-key" data-emoji="🌸" data-key="A"><span className="emoji">🌸</span><span className="key-label">A</span></button>
-          <button className="key emoji-key" data-emoji="❄️" data-key="S"><span className="emoji">❄️</span><span className="key-label">S</span></button>
-          <button className="key emoji-key" data-emoji="🔥" data-key="D"><span className="emoji">🔥</span><span className="key-label">D</span></button>
-          <button className="key emoji-key" data-emoji="🌊" data-key="F"><span className="emoji">🌊</span><span className="key-label">F</span></button>
-          <button className="key emoji-key" data-emoji="☄️" data-key="G"><span className="emoji">☄️</span><span className="key-label">G</span></button>
-          <button className="key emoji-key" data-emoji="🪐" data-key="H"><span className="emoji">🪐</span><span className="key-label">H</span></button>
-          <button className="key emoji-key" data-emoji="🌕" data-key="J"><span className="emoji">🌕</span><span className="key-label">J</span></button>
-        </div>
-        <div className="keyboard-row keyboard-row-bottom">
-          <button id="keyboard-toggle" className="key toggle-key">
-            <span className="toggle-icon">🔷</span>
-          </button>
-          <button className="key emoji-key" data-emoji="🎭" data-key="Z"><span className="emoji">🎭</span><span className="key-label">Z</span></button>
-          <button className="key emoji-key" data-emoji="🌈" data-key="X"><span className="emoji">🌈</span><span className="key-label">X</span></button>
-          <button className="key emoji-key" data-emoji="🎨" data-key="C"><span className="emoji">🎨</span><span className="key-label">C</span></button>
-          <button className="key emoji-key" data-emoji="🌴" data-key="V"><span className="emoji">🌴</span><span className="key-label">V</span></button>
-          <button className="key emoji-key" data-emoji="🦚" data-key="B"><span className="emoji">🦚</span><span className="key-label">B</span></button>
-        </div>
-      </div>
-
-      {/* Geometric Keyboard - Optimized for Touch */}
-      <div id="geometric-keyboard" className="keyboard-container hidden">
-        <div className="keyboard-row keyboard-row-top">
-          <button className="key shape-key" data-shape="circle" data-key="Q"><span className="shape-name">Circle</span><span className="key-label">Q</span></button>
-          <button className="key shape-key" data-shape="square" data-key="W"><span className="shape-name">Square</span><span className="key-label">W</span></button>
-          <button className="key shape-key" data-shape="triangle" data-key="E"><span className="shape-name">Triangle</span><span className="key-label">E</span></button>
-          <button className="key shape-key" data-shape="diamond" data-key="R"><span className="shape-name">Diamond</span><span className="key-label">R</span></button>
-          <button className="key shape-key" data-shape="hexagon" data-key="T"><span className="shape-name">Hexagon</span><span className="key-label">T</span></button>
-          <button className="key shape-key" data-shape="star" data-key="Y"><span className="shape-name">Star</span><span className="key-label">Y</span></button>
-        </div>
-        <div className="keyboard-row keyboard-row-middle">
-          <button className="key shape-key" data-shape="heart" data-key="A"><span className="shape-name">Heart</span><span className="key-label">A</span></button>
-          <button className="key shape-key" data-shape="infinity" data-key="S"><span className="shape-name">Infinity</span><span className="key-label">S</span></button>
-          <button className="key shape-key" data-shape="spiral" data-key="D"><span className="shape-name">Spiral</span><span className="key-label">D</span></button>
-          <button className="key shape-key" data-shape="mandala" data-key="F"><span className="shape-name">Mandala</span><span className="key-label">F</span></button>
-          <button className="key shape-key" data-shape="venn" data-key="G"><span className="shape-name">Venn</span><span className="key-label">G</span></button>
-          <button className="key shape-key" data-shape="wave" data-key="H"><span className="shape-name">Wave</span><span className="key-label">H</span></button>
-        </div>
-        <div className="keyboard-row keyboard-row-bottom">
-          <button id="keyboard-toggle-shapes" className="key toggle-key">
-            <span className="toggle-icon">😊</span>
-          </button>
-        </div>
+        
+        {/* Upload Button */}
+        <button id="upload-button" className="upload-btn-floating">
+          <span className="upload-icon">📸</span>
+          <span className="upload-text">Upload</span>
+        </button>
       </div>
 
       {/* Settings Panel */}

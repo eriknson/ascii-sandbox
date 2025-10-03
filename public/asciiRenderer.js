@@ -67,9 +67,9 @@ class ASCIIRenderer {
     setupCanvas() {
         const dpr = window.devicePixelRatio || 1;
         
-        // Calculate canvas size based on viewport
+        // Calculate canvas size based on viewport (full screen)
         const maxWidth = window.innerWidth;
-        const maxHeight = window.innerHeight - 150; // Account for emoji keyboard
+        const maxHeight = window.innerHeight;
         
         // Calculate optimal grid size
         this.cols = Math.floor(maxWidth / this.charWidth);
