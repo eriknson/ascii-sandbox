@@ -83,6 +83,7 @@ export default function Home() {
               currentEmoji: '💎',
               currentShape: null,
               currentDepthMap: null,
+              uploadedImage: null,
               previousBuffer: renderer.createBuffer(),
               currentBuffer: renderer.createBuffer(),
               backgroundBuffer: renderer.createBuffer(),
@@ -110,6 +111,36 @@ export default function Home() {
     }
 
     const setupUI = (app: any) => {
+      // Image upload handler
+      const uploadInput = document.getElementById('image-upload') as HTMLInputElement
+      const uploadButton = document.getElementById('upload-button')
+      
+      uploadButton?.addEventListener('click', () => {
+        uploadInput?.click()
+      })
+      
+      uploadInput?.addEventListener('change', (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0]
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader()
+          reader.onload = (event) => {
+            const img = new Image()
+            img.onload = () => {
+              if (app.transition.getIsTransitioning()) return
+              app.previousBuffer = JSON.parse(JSON.stringify(app.currentBuffer))
+              loadUploadedImage(app, img)
+              app.transition.start()
+              
+              // Clear emoji/shape selection
+              const allButtons = document.querySelectorAll('.emoji-key, .shape-key')
+              allButtons.forEach(btn => btn.classList.remove('active'))
+            }
+            img.src = event.target?.result as string
+          }
+          reader.readAsDataURL(file)
+        }
+      })
+      
       // Keyboard mode toggles
       const keyboardToggle = document.getElementById('keyboard-toggle')
       const keyboardToggleShapes = document.getElementById('keyboard-toggle-shapes')
@@ -267,13 +298,23 @@ export default function Home() {
       const emojiHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
       app.currentDepthMap = app.converter.create3DDepthMap(emoji, emojiWidth, emojiHeight)
       app.currentShape = null
+      app.uploadedImage = null
     }
     
     const loadShape = (app: any, shapeName: string) => {
       const shapeWidth = Math.min(100, Math.floor(app.renderer.cols * 0.7))
       const shapeHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
       app.currentShape = shapeName
+      app.uploadedImage = null
       // Shape will be generated each frame for animations
+    }
+    
+    const loadUploadedImage = (app: any, image: any) => {
+      const imgWidth = Math.min(100, Math.floor(app.renderer.cols * 0.7))
+      const imgHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
+      app.currentDepthMap = app.converter.create3DDepthMapFromImage(image, imgWidth, imgHeight)
+      app.currentShape = null
+      app.uploadedImage = image
     }
 
     const selectEmoji = (app: any, emoji: string) => {
@@ -358,6 +399,14 @@ export default function Home() {
       <div id="canvas-container">
         <canvas id="ascii-canvas"></canvas>
       </div>
+      
+      {/* Hidden file input for image upload */}
+      <input
+        type="file"
+        id="image-upload"
+        accept="image/*"
+        style={{ display: 'none' }}
+      />
 
       {/* Emoji Keyboard - Optimized for Touch (44x44 minimum) */}
       <div id="emoji-keyboard" className="keyboard-container">
@@ -416,6 +465,12 @@ export default function Home() {
           </button>
         </div>
       </div>
+
+      {/* Upload Image CTA Button */}
+      <button id="upload-button" className="upload-cta">
+        <span className="upload-icon">📸</span>
+        <span className="upload-text">Upload Your Own Image</span>
+      </button>
 
       {/* Settings Panel */}
       <div id="settings-panel" className="settings-panel collapsed">
