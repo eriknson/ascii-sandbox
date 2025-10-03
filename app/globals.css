@@ -176,7 +176,7 @@ body[data-theme="light"] .emoji-btn.active {
     background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 18px;
-    padding: 14px 24px;
+    padding: 16px 24px;
     width: 100%;
     display: flex;
     align-items: center;
@@ -374,43 +374,63 @@ body[data-theme="light"] .toggle-key {
 /* Settings Panel */
 .settings-panel {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 24px;
+    right: 24px;
     z-index: 200;
     transition: all 0.3s ease;
 }
 
 .settings-toggle {
-    background: rgba(40, 40, 40, 0.9);
-    border: 2px solid #444;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(40px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 24px;
+    width: 64px;
+    height: 64px;
+    font-size: 30px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.2s ease;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     outline: none;
     user-select: none;
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 body[data-theme="light"] .settings-toggle {
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid rgba(0, 0, 0, 0.15);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 .settings-toggle:hover {
-    background: rgba(60, 60, 60, 0.9);
-    transform: rotate(90deg);
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05) rotate(90deg);
+    box-shadow: 
+        0 12px 36px rgba(0, 0, 0, 0.35),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.settings-toggle:active {
+    transform: scale(0.95) rotate(90deg);
 }
 
 body[data-theme="light"] .settings-toggle:hover {
-    background: rgba(240, 240, 240, 0.95);
-    border-color: rgba(0, 0, 0, 0.25);
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: 
+        0 12px 36px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 .settings-content {
@@ -616,7 +636,7 @@ body[data-theme="light"] .setting-group select:hover {
     }
     
     .upload-cta-full {
-        padding: 12px 20px;
+        padding: 14px 20px;
         border-radius: 16px;
     }
     
@@ -625,14 +645,14 @@ body[data-theme="light"] .setting-group select:hover {
     }
     
     .settings-panel {
-        top: 12px;
-        right: 12px;
+        top: 20px;
+        right: 20px;
     }
     
     .settings-toggle {
-        width: 44px;
-        height: 44px;
-        font-size: 20px;
+        width: 56px;
+        height: 56px;
+        font-size: 26px;
     }
     
     .settings-content {
@@ -665,7 +685,7 @@ body[data-theme="light"] .setting-group select:hover {
     }
     
     .upload-cta-full {
-        padding: 11px 18px;
+        padding: 13px 18px;
         border-radius: 15px;
     }
     
@@ -674,14 +694,14 @@ body[data-theme="light"] .setting-group select:hover {
     }
     
     .settings-panel {
-        top: 10px;
-        right: 10px;
+        top: 16px;
+        right: 16px;
     }
     
     .settings-toggle {
-        width: 40px;
-        height: 40px;
-        font-size: 18px;
+        width: 52px;
+        height: 52px;
+        font-size: 24px;
     }
     
     .settings-content {
@@ -721,7 +741,7 @@ body[data-theme="light"] .setting-group select:hover {
     }
     
     .upload-cta-full {
-        padding: 10px 16px;
+        padding: 12px 16px;
         border-radius: 14px;
     }
     
@@ -729,16 +749,22 @@ body[data-theme="light"] .setting-group select:hover {
         font-size: 12px;
     }
     
+    .settings-panel {
+        top: 12px;
+        right: 12px;
+    }
+    
     .settings-toggle {
-        width: 36px;
-        height: 36px;
-        font-size: 16px;
+        width: 48px;
+        height: 48px;
+        font-size: 22px;
     }
     
     .settings-content {
         min-width: 200px;
         padding: 12px;
         font-size: 13px;
+        top: 58px;
     }
 }
 
