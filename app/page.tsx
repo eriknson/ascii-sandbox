@@ -85,7 +85,7 @@ export default function Home() {
               background,
               transition,
               geometricShapes,
-              currentEmoji: '💎',
+              currentEmoji: '🦋',
               currentShape: null,
               currentDepthMap: null,
               uploadedImage: null,
@@ -102,7 +102,7 @@ export default function Home() {
         setupUI(app)
         
         // Load initial emoji
-        loadEmoji(app, '💎')
+        loadEmoji(app, '🦋')
         
         // Start animation
         start(app)
@@ -180,8 +180,12 @@ export default function Home() {
         })
       })
 
-      if (emojiButtons.length > 0) {
-        emojiButtons[0].classList.add('active')
+      // Set butterfly as active by default
+      const butterflyBtn = Array.from(emojiButtons).find(btn => 
+        btn.getAttribute('data-emoji') === '🦋'
+      )
+      if (butterflyBtn) {
+        butterflyBtn.classList.add('active')
       }
       
       // Geometric shape buttons
