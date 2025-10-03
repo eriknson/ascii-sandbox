@@ -401,10 +401,10 @@ export default function Home() {
           <button className="emoji-btn" data-emoji="💎" data-key="4"><span className="emoji">💎</span></button>
           <button className="emoji-btn" data-emoji="❤️" data-key="5"><span className="emoji">❤️</span></button>
           <button className="emoji-btn" data-emoji="🎯" data-key="6"><span className="emoji">🎯</span></button>
-          <button id="upload-button" className="emoji-btn upload-cta" title="Upload image">
-            <span className="upload-text">Upload image</span>
-          </button>
         </div>
+        <button id="upload-button" className="upload-cta-full" title="Upload image">
+          <span className="upload-text">Upload image</span>
+        </button>
       </div>
 
       {/* Settings Panel */}

@@ -85,6 +85,10 @@ body[data-theme="light"] #ascii-canvas {
     transform: translateX(-50%);
     z-index: 100;
     max-width: calc(100vw - 32px);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
 }
 
 .emoji-grid {
@@ -167,56 +171,67 @@ body[data-theme="light"] .emoji-btn.active {
         inset 0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
-/* Upload CTA Button */
-.upload-cta {
-    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+/* Upload CTA Button - Full Width */
+.upload-cta-full {
+    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 18px;
+    padding: 14px 24px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
     box-shadow: 
         0 4px 20px rgba(0, 122, 255, 0.4),
         0 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
-    width: auto;
-    padding: 0 20px;
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(40px) saturate(180%);
 }
 
-.upload-cta:hover {
-    background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%) !important;
-    transform: scale(1.08);
+.upload-cta-full:hover {
+    background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+    transform: translateY(-2px);
     box-shadow: 
         0 6px 24px rgba(0, 122, 255, 0.5),
         0 3px 12px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+        inset 0 1px 0 rgba(255, 255, 255, 0.25);
 }
 
-.upload-cta:active {
-    transform: scale(0.96);
+.upload-cta-full:active {
+    transform: translateY(0);
 }
 
-.upload-cta .upload-text {
-    font-size: 13px;
+.upload-cta-full .upload-text {
+    font-size: 15px;
     font-weight: 600;
     color: #ffffff;
     white-space: nowrap;
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
 }
 
-body[data-theme="light"] .upload-cta {
-    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+body[data-theme="light"] .upload-cta-full {
+    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 
         0 4px 20px rgba(0, 122, 255, 0.3),
         0 2px 8px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
-body[data-theme="light"] .upload-cta:hover {
+body[data-theme="light"] .upload-cta-full:hover {
     box-shadow: 
         0 6px 24px rgba(0, 122, 255, 0.4),
         0 3px 12px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+        inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-body[data-theme="light"] .upload-cta .upload-text {
+body[data-theme="light"] .upload-cta-full .upload-text {
     color: #ffffff;
 }
 
@@ -582,6 +597,7 @@ body[data-theme="light"] .setting-group select:hover {
     .floating-controls {
         bottom: 20px;
         max-width: calc(100vw - 24px);
+        gap: 10px;
     }
     
     .emoji-grid {
@@ -599,12 +615,13 @@ body[data-theme="light"] .setting-group select:hover {
         font-size: 26px;
     }
     
-    .upload-cta {
-        padding: 0 18px;
+    .upload-cta-full {
+        padding: 12px 20px;
+        border-radius: 16px;
     }
     
-    .upload-cta .upload-text {
-        font-size: 12px;
+    .upload-cta-full .upload-text {
+        font-size: 14px;
     }
     
     .settings-panel {
@@ -628,6 +645,7 @@ body[data-theme="light"] .setting-group select:hover {
     .floating-controls {
         bottom: 16px;
         max-width: calc(100vw - 20px);
+        gap: 8px;
     }
     
     .emoji-grid {
@@ -646,12 +664,13 @@ body[data-theme="light"] .setting-group select:hover {
         font-size: 24px;
     }
     
-    .upload-cta {
-        padding: 0 16px;
+    .upload-cta-full {
+        padding: 11px 18px;
+        border-radius: 15px;
     }
     
-    .upload-cta .upload-text {
-        font-size: 11px;
+    .upload-cta-full .upload-text {
+        font-size: 13px;
     }
     
     .settings-panel {
@@ -682,6 +701,7 @@ body[data-theme="light"] .setting-group select:hover {
     .floating-controls {
         bottom: 12px;
         max-width: calc(100vw - 16px);
+        gap: 8px;
     }
     
     .emoji-grid {
@@ -700,12 +720,13 @@ body[data-theme="light"] .setting-group select:hover {
         font-size: 22px;
     }
     
-    .upload-cta {
-        padding: 0 14px;
+    .upload-cta-full {
+        padding: 10px 16px;
+        border-radius: 14px;
     }
     
-    .upload-cta .upload-text {
-        font-size: 10px;
+    .upload-cta-full .upload-text {
+        font-size: 12px;
     }
     
     .settings-toggle {
