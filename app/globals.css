@@ -53,8 +53,13 @@ body[data-theme="light"] {
     overflow: hidden;
     width: 100%;
     min-height: 0;
-    background: inherit;
+    background-color: #000000; /* Default to dark */
     pointer-events: none; /* Allow clicks to pass through except for child elements */
+}
+
+html[data-theme="light"] #canvas-container,
+body[data-theme="light"] #canvas-container {
+    background-color: #FFFFFF;
 }
 
 #ascii-canvas {
@@ -65,6 +70,13 @@ body[data-theme="light"] {
     height: 100%;
     object-fit: contain;
     pointer-events: auto;
+    background-color: #000000; /* Match default dark theme */
+}
+
+/* Canvas adapts to theme - use html selector for faster application */
+html[data-theme="light"] #ascii-canvas,
+body[data-theme="light"] #ascii-canvas {
+    background-color: #FFFFFF;
 }
 
 /* Keyboard Container - iOS Style */
@@ -181,6 +193,24 @@ body[data-theme="dark"] .key-label {
 
 .key.active .key-label {
     color: rgba(255, 255, 255, 0.9);
+}
+
+/* Hide keyboard labels on touch devices (mobile/tablet) */
+@media (hover: none) and (pointer: coarse) {
+    .key-label {
+        display: none;
+    }
+    
+    /* Make emojis larger since we have more space */
+    .emoji {
+        font-size: 28px;
+        margin-bottom: 0;
+    }
+    
+    .shape-name {
+        font-size: 12px;
+        margin-bottom: 0;
+    }
 }
 
 /* Shape Name on Keys */

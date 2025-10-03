@@ -94,7 +94,7 @@ export default function Home() {
               backgroundBuffer: renderer.createBuffer(),
               lastTime: performance.now(),
               isRunning: false,
-              theme: 'dark',
+              theme: initialTheme,
               keyboardMode: 'emoji', // 'emoji' or 'geometric'
             }
 
@@ -260,17 +260,27 @@ export default function Home() {
       
           // Theme toggle
           const themeSelect = document.getElementById('theme-select') as HTMLSelectElement
+          // Set initial theme select value to match current theme
+          if (themeSelect) {
+            themeSelect.value = app.theme
+          }
           themeSelect?.addEventListener('change', (e) => {
             app.theme = (e.target as HTMLSelectElement).value
             if (app.theme === 'light') {
               document.body.style.backgroundColor = '#FFFFFF'
               document.body.setAttribute('data-theme', 'light')
+              document.documentElement.setAttribute('data-theme', 'light')
+              document.documentElement.style.backgroundColor = '#FFFFFF'
             } else if (app.theme === 'blue') {
               document.body.style.backgroundColor = '#0a0e27'
               document.body.setAttribute('data-theme', 'dark')
+              document.documentElement.setAttribute('data-theme', 'dark')
+              document.documentElement.style.backgroundColor = '#0a0e27'
             } else {
               document.body.style.backgroundColor = '#000000'
               document.body.setAttribute('data-theme', 'dark')
+              document.documentElement.setAttribute('data-theme', 'dark')
+              document.documentElement.style.backgroundColor = '#000000'
             }
           })
       
@@ -315,12 +325,15 @@ export default function Home() {
     }
     
     const loadUploadedImage = (app: any, image: any) => {
-      // Use larger dimensions for uploaded images to show more detail
-      const imgWidth = Math.min(150, Math.floor(app.renderer.cols * 0.9))
-      const imgHeight = Math.min(120, Math.floor(app.renderer.rows * 0.9))
+      // Use maximum dimensions for uploaded images to show much more detail
+      const imgWidth = Math.min(180, Math.floor(app.renderer.cols * 0.95))
+      const imgHeight = Math.min(140, Math.floor(app.renderer.rows * 0.95))
       app.currentDepthMap = app.converter.create3DDepthMapFromImage(image, imgWidth, imgHeight)
       app.currentShape = null
       app.uploadedImage = image
+      
+      // Slow down rotation significantly for uploaded images to make them easier to see
+      app.rotation.setSpeed(0.3)
     }
 
     const selectEmoji = (app: any, emoji: string) => {
@@ -329,6 +342,8 @@ export default function Home() {
       app.currentEmoji = emoji
       app.currentShape = null
       loadEmoji(app, emoji)
+      // Reset rotation speed to normal when switching to emoji
+      app.rotation.setSpeed(1.0)
       app.transition.start()
     }
     
@@ -337,6 +352,8 @@ export default function Home() {
       app.previousBuffer = JSON.parse(JSON.stringify(app.currentBuffer))
       app.currentShape = shapeName
       loadShape(app, shapeName)
+      // Reset rotation speed to normal when switching to shape
+      app.rotation.setSpeed(1.0)
       app.transition.start()
     }
 

@@ -139,7 +139,7 @@ class EmojiConverter {
     }
     
     /**
-     * Convert custom uploaded image to depth map
+     * Convert custom uploaded image to depth map with better contrast
      */
     imageToDepthMap(image, width, height) {
         // Calculate the best fit for the image
@@ -172,7 +172,31 @@ class EmojiConverter {
         const imageData = this.ctx.getImageData(0, 0, this.size, this.size);
         const data = imageData.data;
         
-        // Create depth map
+        // First pass: collect all brightness values for adaptive contrast
+        const allBrightness = [];
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                const srcX = Math.floor((x / width) * this.size);
+                const srcY = Math.floor((y / height) * this.size);
+                const idx = (srcY * this.size + srcX) * 4;
+                
+                const r = data[idx];
+                const g = data[idx + 1];
+                const b = data[idx + 2];
+                const a = data[idx + 3];
+                
+                const brightness = (r * 0.299 + g * 0.587 + b * 0.114) * (a / 255);
+                allBrightness.push(brightness);
+            }
+        }
+        
+        // Calculate min and max for contrast stretching
+        allBrightness.sort((a, b) => a - b);
+        const minBright = allBrightness[Math.floor(allBrightness.length * 0.02)]; // 2nd percentile
+        const maxBright = allBrightness[Math.floor(allBrightness.length * 0.98)]; // 98th percentile
+        const range = maxBright - minBright;
+        
+        // Create depth map with contrast enhancement
         const depthMap = [];
         for (let y = 0; y < height; y++) {
             depthMap[y] = [];
@@ -189,10 +213,16 @@ class EmojiConverter {
                 const a = data[idx + 3];
                 
                 // Weighted brightness with alpha (perceptual luminance)
-                const brightness = (r * 0.299 + g * 0.587 + b * 0.114) * (a / 255);
+                let brightness = (r * 0.299 + g * 0.587 + b * 0.114) * (a / 255);
                 
-                // Apply gamma correction
-                const gammaCorrected = Math.pow(brightness / 255, 0.9) * 255;
+                // Apply contrast stretching
+                if (range > 0) {
+                    brightness = ((brightness - minBright) / range) * 255;
+                    brightness = Math.max(0, Math.min(255, brightness));
+                }
+                
+                // Apply lighter gamma correction for better mid-tones
+                const gammaCorrected = Math.pow(brightness / 255, 0.85) * 255;
                 depthMap[y][x] = gammaCorrected;
             }
         }
@@ -202,12 +232,13 @@ class EmojiConverter {
     
     /**
      * Create a 3D-ready depth map from uploaded image
+     * Uses less aggressive processing to maintain resemblance
      */
     create3DDepthMapFromImage(image, width, height) {
         const depthMap = this.imageToDepthMap(image, width, height);
-        const enhanced = this.applyEdgeDetection(depthMap);
+        const enhanced = this.applyLightEdgeDetection(depthMap);
         
-        // Add depth information (center is "closer")
+        // Add very subtle depth curve for uploaded images (much less than emojis)
         const centerX = width / 2;
         const centerY = height / 2;
         const maxDist = Math.sqrt(centerX * centerX + centerY * centerY);
@@ -217,9 +248,60 @@ class EmojiConverter {
                 const dx = x - centerX;
                 const dy = y - centerY;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                const depthFactor = 1 - (dist / maxDist) * 0.3; // Subtle depth curve
+                const depthFactor = 1 - (dist / maxDist) * 0.1; // Very subtle depth curve
                 
                 enhanced[y][x] *= depthFactor;
+            }
+        }
+        
+        return enhanced;
+    }
+    
+    /**
+     * Apply lighter edge detection specifically for uploaded images
+     * Less aggressive to maintain recognizability
+     */
+    applyLightEdgeDetection(depthMap) {
+        const height = depthMap.length;
+        const width = depthMap[0].length;
+        const enhanced = [];
+        
+        // Find max brightness for normalization
+        let maxBrightness = 0;
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                maxBrightness = Math.max(maxBrightness, depthMap[y][x]);
+            }
+        }
+        
+        for (let y = 0; y < height; y++) {
+            enhanced[y] = [];
+            for (let x = 0; x < width; x++) {
+                let edgeStrength = 0;
+                
+                // Lighter Sobel edge detection
+                if (x > 0 && x < width - 1 && y > 0 && y < height - 1) {
+                    const gx = 
+                        -depthMap[y-1][x-1] + depthMap[y-1][x+1] +
+                        -2*depthMap[y][x-1] + 2*depthMap[y][x+1] +
+                        -depthMap[y+1][x-1] + depthMap[y+1][x+1];
+                    
+                    const gy = 
+                        -depthMap[y-1][x-1] - 2*depthMap[y-1][x] - depthMap[y-1][x+1] +
+                        depthMap[y+1][x-1] + 2*depthMap[y+1][x] + depthMap[y+1][x+1];
+                    
+                    edgeStrength = Math.sqrt(gx * gx + gy * gy);
+                }
+                
+                // Use less edge enhancement and more original brightness
+                let combined = depthMap[y][x] + edgeStrength * 0.2; // Reduced from 0.4
+                
+                // Normalize with brightness boost for better contrast
+                if (maxBrightness > 0) {
+                    combined = (combined / maxBrightness) * 240; // Higher cap
+                }
+                
+                enhanced[y][x] = Math.min(255, combined);
             }
         }
         

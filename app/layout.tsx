@@ -39,8 +39,6 @@ export default function RootLayout({
                   const bgColor = isDark ? '#000000' : '#FFFFFF';
                   document.documentElement.setAttribute('data-theme', theme);
                   document.documentElement.style.backgroundColor = bgColor;
-                  document.body.setAttribute('data-theme', theme);
-                  document.body.style.backgroundColor = bgColor;
                 } catch (e) {}
               })();
             `,
