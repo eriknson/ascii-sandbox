@@ -9,10 +9,6 @@ export default function Home() {
   useEffect(() => {
     // Only load scripts once
     if (scriptsLoaded.current) {
-      // If scripts are already loaded, just initialize the app
-      if (!appInitialized.current && window.ASCIIRenderer) {
-        initializeApp()
-      }
       return
     }
 
@@ -24,6 +20,7 @@ export default function Home() {
       '/backgrounds.js',
       '/transitions.js',
       '/geometricShapes.js',
+      '/cameraCapture.js',
     ]
 
     const loadScript = (src: string) => {
@@ -54,18 +51,13 @@ export default function Home() {
           return
         }
 
-        // @ts-ignore
         const renderer = new window.ASCIIRenderer(canvas)
-        // @ts-ignore
         const converter = new window.EmojiConverter()
-        // @ts-ignore
         const rotation = new window.Rotation3D(renderer)
-        // @ts-ignore
         const background = new window.BackgroundEffects(renderer)
-        // @ts-ignore
         const transition = new window.TransitionEffects(renderer)
-        // @ts-ignore
         const geometricShapes = new window.GeometricShapes()
+        const camera = new window.CameraCapture(converter)
 
             // Detect initial theme from system preference or existing attribute
             const existingTheme = document.body.getAttribute('data-theme')
@@ -183,7 +175,7 @@ export default function Home() {
           
           if (targetBtn) {
             e.preventDefault()
-            targetBtn.click()
+            ;(targetBtn as HTMLElement).click()
           }
         }
         
