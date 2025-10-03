@@ -1,0 +1,568 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Courier New', monospace;
+    background-color: #000;
+    color: #fff;
+    overflow: hidden;
+    touch-action: none;
+    -webkit-tap-highlight-color: transparent;
+    transition: background-color 0.3s ease;
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+body[data-theme="light"] {
+    background-color: #FFFFFF;
+    color: #000;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+/* Canvas Container */
+#canvas-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    min-height: 0;
+    background: inherit;
+}
+
+#ascii-canvas {
+    display: block;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* Keyboard Container - iOS Style */
+.keyboard-container {
+    width: 100%;
+    background: rgba(210, 213, 219, 0.95);
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 8px 4px 8px;
+    backdrop-filter: blur(20px) saturate(180%);
+    z-index: 100;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+    /* Safe area for mobile devices */
+    padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+
+body[data-theme="dark"] .keyboard-container {
+    background: rgba(40, 40, 45, 0.95);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="light"] .keyboard-container {
+    background: rgba(210, 213, 219, 0.98);
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.keyboard-row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 8px;
+}
+
+.keyboard-row-middle {
+    padding: 0 20px;
+}
+
+.keyboard-row-bottom {
+    margin-bottom: 0;
+    gap: 5px;
+}
+
+/* iOS-Style Key - 44x44 minimum for accessibility */
+.key {
+    position: relative;
+    background: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 0;
+    flex: 1;
+    min-width: 44px;
+    min-height: 44px;
+    height: 50px;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    outline: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.15), 0 0 0 0.5px rgba(0, 0, 0, 0.05);
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body[data-theme="dark"] .key {
+    background: rgba(60, 60, 67, 1);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.3), 0 0 0 0.5px rgba(255, 255, 255, 0.1);
+}
+
+body[data-theme="light"] .key {
+    background: #ffffff;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.12), 0 0 0 0.5px rgba(0, 0, 0, 0.04);
+}
+
+.key:active {
+    opacity: 0.3;
+    transform: scale(0.97);
+}
+
+.key.active {
+    background: #007AFF;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.2), 0 0 0 0.5px rgba(0, 122, 255, 0.3);
+}
+
+body[data-theme="dark"] .key.active {
+    background: #0A84FF;
+}
+
+body[data-theme="light"] .key.active {
+    background: #007AFF;
+}
+
+/* Emoji on Keys */
+.emoji {
+    font-size: 24px;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+
+/* Key Label - iOS Style */
+.key-label {
+    font-size: 9px;
+    color: rgba(0, 0, 0, 0.5);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+body[data-theme="dark"] .key-label {
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.key.active .key-label {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Shape Name on Keys */
+.shape-name {
+    font-size: 10px;
+    color: #000;
+    font-weight: 600;
+    margin-bottom: 2px;
+    text-align: center;
+    line-height: 1.1;
+}
+
+body[data-theme="dark"] .shape-name {
+    color: #fff;
+}
+
+.key.active .shape-name {
+    color: #fff;
+}
+
+/* Toggle Key - iOS Style */
+.toggle-key {
+    background: rgba(174, 179, 190, 1);
+    min-width: 60px;
+    flex: 0 0 60px;
+}
+
+body[data-theme="dark"] .toggle-key {
+    background: rgba(80, 80, 87, 1);
+}
+
+body[data-theme="light"] .toggle-key {
+    background: rgba(174, 179, 190, 1);
+}
+
+.toggle-key:active {
+    opacity: 0.5;
+}
+
+.toggle-icon {
+    font-size: 22px;
+}
+
+/* Settings Panel */
+.settings-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 200;
+    transition: all 0.3s ease;
+}
+
+.settings-toggle {
+    background: rgba(40, 40, 40, 0.9);
+    border: 2px solid #444;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    outline: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body[data-theme="light"] .settings-toggle {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.15);
+}
+
+.settings-toggle:hover {
+    background: rgba(60, 60, 60, 0.9);
+    transform: rotate(90deg);
+}
+
+body[data-theme="light"] .settings-toggle:hover {
+    background: rgba(240, 240, 240, 0.95);
+    border-color: rgba(0, 0, 0, 0.25);
+}
+
+.settings-content {
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background: rgba(20, 20, 20, 0.95);
+    border: 2px solid #444;
+    border-radius: 12px;
+    padding: 20px;
+    min-width: 280px;
+    backdrop-filter: blur(10px);
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+body[data-theme="light"] .settings-content {
+    background: rgba(255, 255, 255, 0.95);
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+}
+
+.settings-panel.collapsed .settings-content {
+    opacity: 0;
+    transform: translateY(-20px);
+    pointer-events: none;
+}
+
+.settings-content h3 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #fff;
+    border-bottom: 1px solid #444;
+    padding-bottom: 10px;
+}
+
+.setting-group {
+    margin-bottom: 20px;
+}
+
+.setting-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: #ccc;
+}
+
+body[data-theme="light"] .setting-group label {
+    color: #333;
+}
+
+.setting-group select {
+    width: 100%;
+    background: rgba(40, 40, 40, 0.9);
+    border: 2px solid #444;
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: #fff;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+body[data-theme="light"] .setting-group select {
+    background: rgba(245, 245, 245, 1);
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    color: #000;
+}
+
+.setting-group select:hover {
+    border-color: #666;
+}
+
+body[data-theme="light"] .setting-group select:hover {
+    background: rgba(235, 235, 235, 1);
+    border-color: rgba(0, 0, 0, 0.3);
+}
+
+.setting-group input[type="range"] {
+    width: 100%;
+    height: 6px;
+    background: #444;
+    border-radius: 3px;
+    outline: none;
+    -webkit-appearance: none;
+}
+
+.setting-group input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.setting-group input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.setting-group input[type="range"]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #fff;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+#speed-value {
+    float: right;
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .emoji-grid {
+        grid-template-columns: repeat(5, 1fr);
+        gap: 6px;
+    }
+
+    .emoji-btn {
+        font-size: 24px;
+        padding: 10px;
+    }
+
+    .settings-panel {
+        top: 10px;
+        right: 10px;
+    }
+
+    .settings-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+
+    .settings-content {
+        min-width: 240px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .emoji-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 5px;
+    }
+
+    .emoji-btn {
+        font-size: 20px;
+        padding: 8px;
+    }
+
+    .settings-content {
+        right: -10px;
+        min-width: 200px;
+    }
+}
+
+/* Hidden class */
+.hidden {
+    display: none !important;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Mobile adjustments - iOS responsive */
+@media (max-width: 768px) {
+    .keyboard-container {
+        padding: 8px 4px max(8px, env(safe-area-inset-bottom));
+    }
+    
+    .keyboard-row {
+        gap: 5px;
+        margin-bottom: 7px;
+    }
+    
+    .keyboard-row-middle {
+        padding: 0 10px;
+    }
+    
+    .key {
+        min-width: 44px;
+        min-height: 44px;
+        height: 48px;
+    }
+    
+    .emoji {
+        font-size: 22px;
+    }
+    
+    .key-label {
+        font-size: 8px;
+    }
+    
+    .shape-name {
+        font-size: 9px;
+    }
+    
+    .toggle-key {
+        min-width: 56px;
+        flex: 0 0 56px;
+    }
+    
+    .settings-panel {
+        top: 10px;
+        right: 10px;
+    }
+    
+    .settings-toggle {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+    
+    .settings-content {
+        min-width: 220px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .keyboard-container {
+        padding: 6px 3px max(6px, env(safe-area-inset-bottom));
+    }
+    
+    .keyboard-row {
+        gap: 4px;
+        margin-bottom: 6px;
+    }
+    
+    .keyboard-row-middle {
+        padding: 0 6px;
+    }
+    
+    .key {
+        min-width: 44px;
+        min-height: 44px;
+        height: 46px;
+    }
+    
+    .emoji {
+        font-size: 20px;
+    }
+    
+    .key-label {
+        font-size: 7px;
+    }
+    
+    .shape-name {
+        font-size: 8px;
+        line-height: 1;
+    }
+    
+    .toggle-key {
+        min-width: 52px;
+        flex: 0 0 52px;
+    }
+    
+    .toggle-icon {
+        font-size: 20px;
+    }
+    
+    .settings-panel {
+        top: 8px;
+        right: 8px;
+    }
+    
+    .settings-toggle {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+    
+    .settings-content {
+        min-width: 200px;
+        padding: 12px;
+        top: 50px;
+        right: -10px;
+    }
+    
+    .setting-group {
+        margin-bottom: 12px;
+    }
+}
+
+/* Prevent overscroll on mobile */
+html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Viewport meta for mobile */
+@viewport {
+    width: device-width;
+    zoom: 1;
+    user-zoom: fixed;
+}
+
