@@ -80,23 +80,20 @@ body[data-theme="light"] #ascii-canvas {
 /* Floating Controls - iOS Liquid Design */
 .floating-controls {
     position: fixed;
-    bottom: 32px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 100;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
+    max-width: calc(100vw - 32px);
 }
 
 .emoji-grid {
     display: flex;
     gap: 10px;
-    padding: 14px 18px;
+    padding: 12px 16px;
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 24px;
+    border-radius: 22px;
     border: 1px solid rgba(255, 255, 255, 0.18);
     box-shadow: 
         0 8px 32px rgba(0, 0, 0, 0.3),
@@ -168,6 +165,59 @@ body[data-theme="light"] .emoji-btn.active {
     box-shadow: 
         0 0 20px rgba(0, 0, 0, 0.1),
         inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+}
+
+/* Upload CTA Button */
+.upload-cta {
+    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 
+        0 4px 20px rgba(0, 122, 255, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+    width: auto;
+    padding: 0 20px;
+}
+
+.upload-cta:hover {
+    background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%) !important;
+    transform: scale(1.08);
+    box-shadow: 
+        0 6px 24px rgba(0, 122, 255, 0.5),
+        0 3px 12px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.upload-cta:active {
+    transform: scale(0.96);
+}
+
+.upload-cta .upload-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ffffff;
+    white-space: nowrap;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+
+body[data-theme="light"] .upload-cta {
+    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    box-shadow: 
+        0 4px 20px rgba(0, 122, 255, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+body[data-theme="light"] .upload-cta:hover {
+    box-shadow: 
+        0 6px 24px rgba(0, 122, 255, 0.4),
+        0 3px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35) !important;
+}
+
+body[data-theme="light"] .upload-cta .upload-text {
+    color: #ffffff;
 }
 
 /* iOS-Style Key - 44x44 minimum for accessibility */
@@ -511,67 +561,6 @@ body[data-theme="light"] .setting-group select:hover {
     }
 }
 
-/* Upload Button - Floating */
-.upload-btn-floating {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(40px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    color: #ffffff;
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    outline: none;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-tap-highlight-color: transparent;
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
-
-.upload-btn-floating .upload-icon {
-    font-size: 18px;
-    line-height: 1;
-}
-
-.upload-btn-floating .upload-text {
-    line-height: 1;
-}
-
-.upload-btn-floating:hover {
-    background: rgba(255, 255, 255, 0.18);
-    transform: translateY(-2px);
-    box-shadow: 
-        0 6px 20px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
-}
-
-.upload-btn-floating:active {
-    transform: translateY(0);
-}
-
-body[data-theme="light"] .upload-btn-floating {
-    background: rgba(0, 0, 0, 0.06);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    color: #000000;
-    box-shadow: 
-        0 4px 16px rgba(0, 0, 0, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.5);
-}
-
-body[data-theme="light"] .upload-btn-floating:hover {
-    background: rgba(0, 0, 0, 0.1);
-    box-shadow: 
-        0 6px 20px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.6);
-}
 
 /* Hidden class */
 .hidden {
@@ -591,31 +580,36 @@ body[data-theme="light"] .upload-btn-floating:hover {
 /* Mobile Responsive - iOS Liquid Design */
 @media (max-width: 768px) {
     .floating-controls {
-        bottom: 24px;
+        bottom: 20px;
+        max-width: calc(100vw - 24px);
     }
     
     .emoji-grid {
         gap: 8px;
-        padding: 12px 16px;
+        padding: 10px 14px;
+        border-radius: 20px;
     }
     
     .emoji-btn {
-        width: 50px;
-        height: 50px;
+        width: 52px;
+        height: 52px;
     }
     
     .emoji-btn .emoji {
         font-size: 26px;
     }
     
-    .upload-btn-floating {
-        padding: 10px 20px;
-        font-size: 14px;
+    .upload-cta {
+        padding: 0 18px;
+    }
+    
+    .upload-cta .upload-text {
+        font-size: 12px;
     }
     
     .settings-panel {
-        top: 10px;
-        right: 10px;
+        top: 12px;
+        right: 12px;
     }
     
     .settings-toggle {
@@ -625,42 +619,44 @@ body[data-theme="light"] .upload-btn-floating:hover {
     }
     
     .settings-content {
-        min-width: 220px;
-        padding: 15px;
+        min-width: 240px;
+        padding: 16px;
     }
 }
 
 @media (max-width: 480px) {
     .floating-controls {
-        bottom: 20px;
+        bottom: 16px;
+        max-width: calc(100vw - 20px);
     }
     
     .emoji-grid {
         gap: 6px;
-        padding: 10px 14px;
+        padding: 8px 12px;
+        border-radius: 18px;
     }
     
     .emoji-btn {
-        width: 46px;
-        height: 46px;
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
     }
     
     .emoji-btn .emoji {
         font-size: 24px;
     }
     
-    .upload-btn-floating {
-        padding: 8px 18px;
-        font-size: 13px;
+    .upload-cta {
+        padding: 0 16px;
     }
     
-    .upload-btn-floating .upload-icon {
-        font-size: 16px;
+    .upload-cta .upload-text {
+        font-size: 11px;
     }
     
     .settings-panel {
-        top: 8px;
-        right: 8px;
+        top: 10px;
+        right: 10px;
     }
     
     .settings-toggle {
@@ -670,14 +666,58 @@ body[data-theme="light"] .upload-btn-floating:hover {
     }
     
     .settings-content {
-        min-width: 200px;
-        padding: 12px;
+        min-width: 220px;
+        padding: 14px;
         top: 50px;
         right: -10px;
     }
     
     .setting-group {
         margin-bottom: 12px;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 380px) {
+    .floating-controls {
+        bottom: 12px;
+        max-width: calc(100vw - 16px);
+    }
+    
+    .emoji-grid {
+        gap: 5px;
+        padding: 7px 10px;
+        border-radius: 16px;
+    }
+    
+    .emoji-btn {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+    }
+    
+    .emoji-btn .emoji {
+        font-size: 22px;
+    }
+    
+    .upload-cta {
+        padding: 0 14px;
+    }
+    
+    .upload-cta .upload-text {
+        font-size: 10px;
+    }
+    
+    .settings-toggle {
+        width: 36px;
+        height: 36px;
+        font-size: 16px;
+    }
+    
+    .settings-content {
+        min-width: 200px;
+        padding: 12px;
+        font-size: 13px;
     }
 }
 

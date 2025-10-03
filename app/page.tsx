@@ -167,16 +167,16 @@ export default function Home() {
         butterflyBtn.classList.add('active')
       }
       
-      // Number key shortcuts (1-8)
+      // Number key shortcuts (1-6)
       document.addEventListener('keydown', (e) => {
         // Don't intercept CMD/CTRL key combinations
         if (e.metaKey || e.ctrlKey) {
           return
         }
         
-        // Number keys 1-8
+        // Number keys 1-6 for emojis
         const key = e.key
-        if (key >= '1' && key <= '8') {
+        if (key >= '1' && key <= '6') {
           const targetBtn = Array.from(emojiButtons).find(btn => 
             btn.getAttribute('data-key') === key
           )
@@ -185,6 +185,12 @@ export default function Home() {
             e.preventDefault()
             targetBtn.click()
           }
+        }
+        
+        // U key for upload
+        if (key === 'u' || key === 'U') {
+          e.preventDefault()
+          uploadButton?.click()
         }
       })
 
@@ -388,23 +394,17 @@ export default function Home() {
 
       {/* Floating Control Panel */}
       <div className="floating-controls">
-        {/* Emoji Grid */}
         <div className="emoji-grid">
           <button className="emoji-btn" data-emoji="🦋" data-key="1"><span className="emoji">🦋</span></button>
           <button className="emoji-btn" data-emoji="✨" data-key="2"><span className="emoji">✨</span></button>
           <button className="emoji-btn" data-emoji="🔥" data-key="3"><span className="emoji">🔥</span></button>
           <button className="emoji-btn" data-emoji="💎" data-key="4"><span className="emoji">💎</span></button>
-          <button className="emoji-btn" data-emoji="🌊" data-key="5"><span className="emoji">🌊</span></button>
-          <button className="emoji-btn" data-emoji="🌙" data-key="6"><span className="emoji">🌙</span></button>
-          <button className="emoji-btn" data-emoji="🎨" data-key="7"><span className="emoji">🎨</span></button>
-          <button className="emoji-btn" data-emoji="⭐" data-key="8"><span className="emoji">⭐</span></button>
+          <button className="emoji-btn" data-emoji="❤️" data-key="5"><span className="emoji">❤️</span></button>
+          <button className="emoji-btn" data-emoji="🎯" data-key="6"><span className="emoji">🎯</span></button>
+          <button id="upload-button" className="emoji-btn upload-cta" title="Upload image">
+            <span className="upload-text">Upload image</span>
+          </button>
         </div>
-        
-        {/* Upload Button */}
-        <button id="upload-button" className="upload-btn-floating">
-          <span className="upload-icon">📸</span>
-          <span className="upload-text">Upload</span>
-        </button>
       </div>
 
       {/* Settings Panel */}
