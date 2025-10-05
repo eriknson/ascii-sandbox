@@ -7,6 +7,7 @@ interface Window {
   BackgroundEffects: any
   TransitionEffects: any
   GeometricShapes: any
+  CameraCapture: any
   app: any
 }
 

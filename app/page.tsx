@@ -77,10 +77,12 @@ export default function Home() {
               background,
               transition,
               geometricShapes,
+              camera,
               currentEmoji: '🦋',
               currentShape: null,
               currentDepthMap: null,
               uploadedImage: null,
+              cameraActive: false,
               previousBuffer: renderer.createBuffer(),
               currentBuffer: renderer.createBuffer(),
               backgroundBuffer: renderer.createBuffer(),
@@ -124,6 +126,18 @@ export default function Home() {
             const img = new Image()
             img.onload = () => {
               if (app.transition.getIsTransitioning()) return
+              
+              // Stop camera if active
+              if (app.cameraActive) {
+                app.camera.stop()
+                app.cameraActive = false
+                const cameraBtn = document.getElementById('camera-button')
+                if (cameraBtn) {
+                  cameraBtn.classList.remove('active')
+                  cameraBtn.textContent = 'Start Camera'
+                }
+              }
+              
               app.previousBuffer = JSON.parse(JSON.stringify(app.currentBuffer))
               loadUploadedImage(app, img)
               app.transition.start()
@@ -138,12 +152,56 @@ export default function Home() {
         }
       })
       
+      // Camera button handler
+      const cameraButton = document.getElementById('camera-button')
+      cameraButton?.addEventListener('click', async () => {
+        if (app.cameraActive) {
+          // Stop camera
+          app.camera.stop()
+          app.cameraActive = false
+          cameraButton.classList.remove('active')
+          cameraButton.textContent = 'Start Camera'
+          
+          // Return to emoji mode
+          loadEmoji(app, app.currentEmoji)
+          app.rotation.setSpeed(1.0)
+        } else {
+          // Start camera
+          const started = await app.camera.start()
+          if (started) {
+            app.cameraActive = true
+            app.currentShape = null
+            app.uploadedImage = null
+            cameraButton.classList.add('active')
+            cameraButton.textContent = 'Stop Camera'
+            
+            // Clear emoji selection
+            const allButtons = document.querySelectorAll('.emoji-btn')
+            allButtons.forEach(btn => btn.classList.remove('active'))
+            
+            // Set slower rotation speed for camera
+            app.rotation.setSpeed(0.5)
+          }
+        }
+      })
+      
       // Emoji buttons
       const emojiButtons = document.querySelectorAll('.emoji-btn')
       emojiButtons.forEach(btn => {
         btn.addEventListener('click', () => {
           const emoji = btn.getAttribute('data-emoji')
           if (emoji) {
+            // Stop camera if active
+            if (app.cameraActive) {
+              app.camera.stop()
+              app.cameraActive = false
+              const cameraBtn = document.getElementById('camera-button')
+              if (cameraBtn) {
+                cameraBtn.classList.remove('active')
+                cameraBtn.textContent = 'Start Camera'
+              }
+            }
+            
             selectEmoji(app, emoji)
             emojiButtons.forEach(b => b.classList.remove('active'))
             btn.classList.add('active')
@@ -183,6 +241,13 @@ export default function Home() {
         if (key === 'u' || key === 'U') {
           e.preventDefault()
           uploadButton?.click()
+        }
+        
+        // C key for camera
+        if (key === 'c' || key === 'C') {
+          e.preventDefault()
+          const cameraBtn = document.getElementById('camera-button')
+          cameraBtn?.click()
         }
       })
 
@@ -323,11 +388,18 @@ export default function Home() {
       app.geometricShapes.updateTime(dt)
 
       // Generate depth map based on mode
-      if (app.currentShape) {
+      if (app.cameraActive) {
+        // Capture camera frame in real-time
+        const frame = app.camera.captureFrame(app.renderer)
+        if (frame) {
+          app.currentDepthMap = frame
+        }
+      } else if (app.currentShape) {
         const shapeWidth = Math.min(100, Math.floor(app.renderer.cols * 0.7))
         const shapeHeight = Math.min(80, Math.floor(app.renderer.rows * 0.7))
         app.currentDepthMap = app.geometricShapes.generateShape(app.currentShape, shapeWidth, shapeHeight, app.geometricShapes.time)
       }
+      // If neither camera nor shape is active, currentDepthMap retains the emoji depth map from loadEmoji()
       
       if (app.currentDepthMap) {
         app.rotation.renderRotated(app.currentDepthMap, app.currentBuffer, app.rotation.getAngle())
@@ -394,9 +466,14 @@ export default function Home() {
           <button className="emoji-btn" data-emoji="❤️" data-key="5"><span className="emoji">❤️</span></button>
           <button className="emoji-btn" data-emoji="🎯" data-key="6"><span className="emoji">🎯</span></button>
         </div>
-        <button id="upload-button" className="upload-cta-full" title="Upload image">
-          <span className="upload-text">Upload image</span>
-        </button>
+        <div className="button-row">
+          <button id="upload-button" className="upload-cta-full" title="Upload image (U)">
+            <span className="upload-text">Upload image</span>
+          </button>
+          <button id="camera-button" className="camera-cta-full" title="Start camera (C)">
+            Start Camera
+          </button>
+        </div>
       </div>
 
       {/* Settings Panel */}

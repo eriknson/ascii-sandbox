@@ -173,8 +173,8 @@ body[data-theme="light"] .emoji-btn.active {
 
 /* Upload CTA Button - Full Width */
 .upload-cta-full {
-    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
     border-radius: 18px;
     padding: 16px 24px;
     width: 100%;
@@ -188,23 +188,32 @@ body[data-theme="light"] .emoji-btn.active {
     -webkit-user-select: none;
     -webkit-tap-highlight-color: transparent;
     box-shadow: 
-        0 4px 20px rgba(0, 122, 255, 0.4),
-        0 2px 8px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(40px) saturate(180%);
 }
 
 .upload-cta-full:hover {
-    background: linear-gradient(135deg, #0051D5 0%, #003DA5 100%);
+    background: rgba(255, 255, 255, 0.15);
     transform: translateY(-2px);
     box-shadow: 
-        0 6px 24px rgba(0, 122, 255, 0.5),
-        0 3px 12px rgba(0, 0, 0, 0.25),
-        inset 0 1px 0 rgba(255, 255, 255, 0.25);
+        0 12px 36px rgba(0, 0, 0, 0.35),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .upload-cta-full:active {
     transform: translateY(0);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Better touch feedback on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .upload-cta-full:active {
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(0.98);
+    }
 }
 
 .upload-cta-full .upload-text {
@@ -216,23 +225,135 @@ body[data-theme="light"] .emoji-btn.active {
 }
 
 body[data-theme="light"] .upload-cta-full {
-    background: linear-gradient(135deg, #007AFF 0%, #0051D5 100%);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.08);
     box-shadow: 
-        0 4px 20px rgba(0, 122, 255, 0.3),
-        0 2px 8px rgba(0, 0, 0, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 body[data-theme="light"] .upload-cta-full:hover {
+    background: rgba(0, 0, 0, 0.08);
     box-shadow: 
-        0 6px 24px rgba(0, 122, 255, 0.4),
-        0 3px 12px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.35);
+        0 12px 36px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
 }
 
 body[data-theme="light"] .upload-cta-full .upload-text {
+    color: #000000;
+}
+
+/* Button Row Container */
+.button-row {
+    display: flex;
+    gap: 12px;
+    width: 100%;
+}
+
+.button-row > button {
+    flex: 1;
+    min-height: 52px; /* Minimum touch target for accessibility */
+}
+
+/* Camera CTA Button - Full Width */
+.camera-cta-full {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 18px;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 2px 8px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(40px) saturate(180%);
+    font-size: 15px;
+    font-weight: 600;
     color: #ffffff;
+    white-space: nowrap;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+}
+
+.camera-cta-full:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 
+        0 12px 36px rgba(0, 0, 0, 0.35),
+        0 4px 12px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.camera-cta-full:active {
+    transform: translateY(0);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Better touch feedback on mobile */
+@media (hover: none) and (pointer: coarse) {
+    .camera-cta-full:active {
+        background: rgba(255, 255, 255, 0.25);
+        transform: scale(0.98);
+    }
+    
+    .camera-cta-full.active:active {
+        background: rgba(255, 59, 48, 0.35);
+        transform: scale(0.98);
+    }
+}
+
+.camera-cta-full.active {
+    background: rgba(255, 59, 48, 0.2);
+    border: 1px solid rgba(255, 59, 48, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(255, 59, 48, 0.4),
+        0 2px 8px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.camera-cta-full.active:hover {
+    background: rgba(255, 59, 48, 0.3);
+    box-shadow: 
+        0 12px 36px rgba(255, 59, 48, 0.5),
+        0 4px 12px rgba(0, 0, 0, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+body[data-theme="light"] .camera-cta-full {
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: #000000;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+body[data-theme="light"] .camera-cta-full:hover {
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: 
+        0 12px 36px rgba(0, 0, 0, 0.15),
+        0 4px 12px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+body[data-theme="light"] .camera-cta-full.active {
+    background: rgba(255, 59, 48, 0.15);
+    border: 1px solid rgba(255, 59, 48, 0.25);
+    color: #D62518;
+    box-shadow: 
+        0 8px 32px rgba(255, 59, 48, 0.2),
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 /* iOS-Style Key - 44x44 minimum for accessibility */
@@ -636,12 +757,24 @@ body[data-theme="light"] .setting-group select:hover {
     }
     
     .upload-cta-full {
-        padding: 14px 20px;
+        padding: 16px 18px;
         border-radius: 16px;
+        min-height: 52px;
     }
     
     .upload-cta-full .upload-text {
-        font-size: 14px;
+        font-size: 15px;
+    }
+    
+    .camera-cta-full {
+        padding: 16px 18px;
+        border-radius: 16px;
+        font-size: 15px;
+        min-height: 52px;
+    }
+    
+    .button-row {
+        gap: 10px;
     }
     
     .settings-panel {
@@ -661,11 +794,26 @@ body[data-theme="light"] .setting-group select:hover {
     }
 }
 
+/* Medium mobile & landscape phones - keep buttons side by side */
+@media (max-width: 640px) and (min-width: 481px) {
+    .button-row {
+        flex-direction: row;
+        gap: 8px;
+    }
+    
+    .upload-cta-full,
+    .camera-cta-full {
+        padding: 14px 16px;
+        min-height: 50px;
+        font-size: 14px;
+    }
+}
+
 @media (max-width: 480px) {
     .floating-controls {
-        bottom: 16px;
-        max-width: calc(100vw - 20px);
-        gap: 8px;
+        bottom: 12px;
+        max-width: calc(100vw - 16px);
+        gap: 10px;
     }
     
     .emoji-grid {
@@ -684,13 +832,34 @@ body[data-theme="light"] .setting-group select:hover {
         font-size: 24px;
     }
     
+    /* Stack buttons vertically on small mobile screens */
+    .button-row {
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    .button-row > button {
+        width: 100%;
+    }
+    
     .upload-cta-full {
-        padding: 13px 18px;
-        border-radius: 15px;
+        padding: 15px 20px;
+        border-radius: 16px;
+        min-height: 50px;
+        width: 100%;
     }
     
     .upload-cta-full .upload-text {
-        font-size: 13px;
+        font-size: 15px;
+    }
+    
+    .camera-cta-full {
+        padding: 15px 20px;
+        border-radius: 16px;
+        font-size: 15px;
+        min-height: 50px;
+        width: 100%;
     }
     
     .settings-panel {
@@ -719,8 +888,8 @@ body[data-theme="light"] .setting-group select:hover {
 /* Extra small devices */
 @media (max-width: 380px) {
     .floating-controls {
-        bottom: 12px;
-        max-width: calc(100vw - 16px);
+        bottom: 10px;
+        max-width: calc(100vw - 12px);
         gap: 8px;
     }
     
@@ -740,13 +909,29 @@ body[data-theme="light"] .setting-group select:hover {
         font-size: 22px;
     }
     
+    /* Keep buttons stacked vertically */
+    .button-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
     .upload-cta-full {
-        padding: 12px 16px;
-        border-radius: 14px;
+        padding: 14px 18px;
+        border-radius: 15px;
+        min-height: 48px;
+        width: 100%;
     }
     
     .upload-cta-full .upload-text {
-        font-size: 12px;
+        font-size: 14px;
+    }
+    
+    .camera-cta-full {
+        padding: 14px 18px;
+        border-radius: 15px;
+        font-size: 14px;
+        min-height: 48px;
+        width: 100%;
     }
     
     .settings-panel {
@@ -765,6 +950,26 @@ body[data-theme="light"] .setting-group select:hover {
         padding: 12px;
         font-size: 13px;
         top: 58px;
+    }
+}
+
+/* Landscape orientation on mobile - keep buttons horizontal */
+@media (max-height: 500px) and (orientation: landscape) {
+    .button-row {
+        flex-direction: row !important;
+        gap: 8px;
+    }
+    
+    .upload-cta-full,
+    .camera-cta-full {
+        padding: 12px 16px;
+        min-height: 44px;
+        font-size: 14px;
+    }
+    
+    .floating-controls {
+        bottom: 10px;
+        gap: 8px;
     }
 }
 
