@@ -1,10 +1,16 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { Drawer } from 'vaul'
+import GIF from 'gif.js'
 
 export default function Home() {
   const scriptsLoaded = useRef(false)
   const appInitialized = useRef(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [currentPage, setCurrentPage] = useState(0)
+  const touchStartX = useRef(0)
+  const touchEndX = useRef(0)
 
   useEffect(() => {
     // Only load scripts once
@@ -109,6 +115,100 @@ export default function Home() {
       }
     }
 
+    const exportAsGif = (app: any) => {
+      const button = document.getElementById('export-gif-button')
+      if (!button) return
+      
+      // Store original content
+      const originalHTML = button.innerHTML
+      
+      // Disable button during export and show loading
+      button.setAttribute('disabled', 'true')
+      button.innerHTML = '<span class="export-spinner"></span>'
+      button.classList.add('exporting')
+      
+      // Get actual display dimensions of the canvas
+      const canvasRect = app.canvas.getBoundingClientRect()
+      const exportWidth = Math.floor(canvasRect.width)
+      const exportHeight = Math.floor(canvasRect.height)
+      
+      // Create a temporary canvas for proper sizing
+      const tempCanvas = document.createElement('canvas')
+      tempCanvas.width = exportWidth
+      tempCanvas.height = exportHeight
+      const tempCtx = tempCanvas.getContext('2d')
+      
+      // Create GIF encoder with proper dimensions
+      const gif = new GIF({
+        workers: 2,
+        quality: 10,
+        width: exportWidth,
+        height: exportHeight,
+        workerScript: '/gif.worker.js'
+      })
+      
+      // Capture parameters
+      const fps = 30
+      const duration = 3 // seconds
+      const totalFrames = fps * duration
+      const frameDelay = 1000 / fps
+      
+      let framesCaptured = 0
+      
+      // Capture frames
+      const captureFrame = () => {
+        if (framesCaptured >= totalFrames) {
+          // All frames captured, render GIF
+          button.innerHTML = '<span class="export-spinner"></span>'
+          gif.render()
+          return
+        }
+        
+        // Draw the current canvas to temp canvas at proper size
+        if (tempCtx) {
+          tempCtx.clearRect(0, 0, exportWidth, exportHeight)
+          tempCtx.drawImage(app.canvas, 0, 0, exportWidth, exportHeight)
+        }
+        
+        // Add frame to GIF
+        gif.addFrame(tempCanvas, { copy: true, delay: frameDelay })
+        framesCaptured++
+        
+        // Update button with progress
+        const progress = Math.round((framesCaptured / totalFrames) * 100)
+        button.innerHTML = `<span class="export-spinner"></span>`
+        
+        // Capture next frame
+        requestAnimationFrame(captureFrame)
+      }
+      
+      // Start capturing
+      requestAnimationFrame(captureFrame)
+      
+      // When GIF is ready, download it
+      gif.on('finished', (blob: Blob) => {
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.download = `ascii-animation-${Date.now()}.gif`
+        link.click()
+        URL.revokeObjectURL(url)
+        
+        // Clean up
+        tempCanvas.remove()
+        
+        // Re-enable button
+        button.removeAttribute('disabled')
+        button.classList.remove('exporting')
+        button.innerHTML = originalHTML
+      })
+      
+      gif.on('progress', (p: number) => {
+        const progress = Math.round(p * 100)
+        button.innerHTML = `<span class="export-spinner"></span>`
+      })
+    }
+
     const setupUI = (app: any) => {
       // Image upload handler
       const uploadInput = document.getElementById('image-upload') as HTMLInputElement
@@ -202,7 +302,12 @@ export default function Home() {
               }
             }
             
-            selectEmoji(app, emoji)
+            // Handle cube as a special shape
+            if (emoji === 'CUBE') {
+              selectShape(app, 'cube')
+            } else {
+              selectEmoji(app, emoji)
+            }
             emojiButtons.forEach(b => b.classList.remove('active'))
             btn.classList.add('active')
           }
@@ -256,6 +361,12 @@ export default function Home() {
       const settingsPanel = document.getElementById('settings-panel')
       settingsToggle?.addEventListener('click', () => {
         settingsPanel?.classList.toggle('collapsed')
+      })
+
+      // Export GIF button
+      const exportGifButton = document.getElementById('export-gif-button')
+      exportGifButton?.addEventListener('click', () => {
+        exportAsGif(app)
       })
 
       // Background effect
@@ -464,11 +575,17 @@ export default function Home() {
           <button className="emoji-btn" data-emoji="🔥" data-key="3"><span className="emoji">🔥</span></button>
           <button className="emoji-btn" data-emoji="💎" data-key="4"><span className="emoji">💎</span></button>
           <button className="emoji-btn" data-emoji="❤️" data-key="5"><span className="emoji">❤️</span></button>
-          <button className="emoji-btn" data-emoji="🎯" data-key="6"><span className="emoji">🎯</span></button>
+          <button 
+            className="emoji-btn more-emoji-btn" 
+            onClick={() => setDrawerOpen(true)}
+            data-key="6"
+          >
+            <span className="emoji">➕</span>
+          </button>
         </div>
         <div className="button-row">
           <button id="upload-button" className="upload-cta-full" title="Upload image (U)">
-            <span className="upload-text">Upload image</span>
+            <span className="upload-text">Upload Image</span>
           </button>
           <button id="camera-button" className="camera-cta-full" title="Start camera (C)">
             Start Camera
@@ -478,8 +595,11 @@ export default function Home() {
 
       {/* Settings Panel */}
       <div id="settings-panel" className="settings-panel collapsed">
+        <button id="export-gif-button" className="settings-toggle export-gif-btn" aria-label="Export as GIF" title="Export as GIF">
+          <span className="button-icon">📹</span>
+        </button>
         <button id="settings-toggle" className="settings-toggle" aria-label="Toggle settings">
-          ⚙️
+          <span className="button-icon">⚙️</span>
         </button>
         <div className="settings-content">
           <h3>Settings</h3>
@@ -551,6 +671,177 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      {/* Emoji Picker Drawer */}
+      <Drawer.Root 
+        open={drawerOpen} 
+        onOpenChange={(open) => {
+          setDrawerOpen(open)
+          if (!open) {
+            setCurrentPage(0) // Reset to first page when closing
+          }
+        }}
+      >
+        <Drawer.Portal>
+          <Drawer.Overlay className="drawer-overlay" />
+          <Drawer.Content className="drawer-content">
+            <div className="drawer-handle-container">
+              <div className="drawer-handle" />
+            </div>
+            
+            <div className="drawer-body">
+              {/* Emoji Pages */}
+              <div 
+                className="emoji-pages-container"
+                onTouchStart={(e) => {
+                  touchStartX.current = e.touches[0].clientX
+                }}
+                onTouchMove={(e) => {
+                  touchEndX.current = e.touches[0].clientX
+                }}
+                onTouchEnd={() => {
+                  const swipeDistance = touchStartX.current - touchEndX.current
+                  const minSwipeDistance = 50
+                  
+                  if (Math.abs(swipeDistance) > minSwipeDistance) {
+                    if (swipeDistance > 0 && currentPage < 2) {
+                      // Swipe left - next page
+                      setCurrentPage(currentPage + 1)
+                    } else if (swipeDistance < 0 && currentPage > 0) {
+                      // Swipe right - previous page
+                      setCurrentPage(currentPage - 1)
+                    }
+                  }
+                }}
+              >
+                <div 
+                  className="emoji-pages"
+                  style={{ transform: `translateX(-${currentPage * 100}%)` }}
+                >
+                  {/* Page 1: Smileys & People */}
+                  <div className="emoji-page">
+                    <div className="emoji-picker-grid">
+                      {['😀', '😂', '😍', '😎', '😭', '😡', '🤔', '😴', '🤩', '😇', '🥳', '🤗', '🙃', '😋', '😜', '🤓', '😈', '👻', '👽', '🤖', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'].map(emoji => (
+                        <button
+                          key={emoji}
+                          className="emoji-picker-btn"
+                          onClick={() => {
+                            const emojiBtn = document.querySelector(`[data-emoji="${emoji}"]`) as HTMLElement
+                            if (emojiBtn) {
+                              emojiBtn.click()
+                            } else {
+                              // For emojis not in quick select, select them directly
+                              if (window.app) {
+                                window.app.previousBuffer = JSON.parse(JSON.stringify(window.app.currentBuffer))
+                                window.app.currentEmoji = emoji
+                                const emojiWidth = Math.min(120, Math.floor(window.app.renderer.cols * 0.8))
+                                const emojiHeight = Math.min(100, Math.floor(window.app.renderer.rows * 0.8))
+                                window.app.currentDepthMap = window.app.converter.create3DDepthMap(emoji, emojiWidth, emojiHeight)
+                                window.app.currentShape = null
+                                window.app.uploadedImage = null
+                                window.app.rotation.setSpeed(1.0)
+                                window.app.transition.start()
+                              }
+                            }
+                            setDrawerOpen(false)
+                          }}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Page 2: Animals & Nature */}
+                  <div className="emoji-page">
+                    <div className="emoji-picker-grid">
+                      {['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙'].map(emoji => (
+                        <button
+                          key={emoji}
+                          className="emoji-picker-btn"
+                          onClick={() => {
+                            if (window.app) {
+                              window.app.previousBuffer = JSON.parse(JSON.stringify(window.app.currentBuffer))
+                              window.app.currentEmoji = emoji
+                              const emojiWidth = Math.min(120, Math.floor(window.app.renderer.cols * 0.8))
+                              const emojiHeight = Math.min(100, Math.floor(window.app.renderer.rows * 0.8))
+                              window.app.currentDepthMap = window.app.converter.create3DDepthMap(emoji, emojiWidth, emojiHeight)
+                              window.app.currentShape = null
+                              window.app.uploadedImage = null
+                              window.app.rotation.setSpeed(1.0)
+                              window.app.transition.start()
+                            }
+                            setDrawerOpen(false)
+                          }}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Page 3: Food & Drink */}
+                  <div className="emoji-page">
+                    <div className="emoji-picker-grid">
+                      {['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶', '🌽', '🥕', '🥔', '🍠', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🥞', '🥓', '🥩', '🍗', '🍖', '🌭', '🍔', '🍟'].map(emoji => (
+                        <button
+                          key={emoji}
+                          className="emoji-picker-btn"
+                          onClick={() => {
+                            if (window.app) {
+                              window.app.previousBuffer = JSON.parse(JSON.stringify(window.app.currentBuffer))
+                              window.app.currentEmoji = emoji
+                              const emojiWidth = Math.min(120, Math.floor(window.app.renderer.cols * 0.8))
+                              const emojiHeight = Math.min(100, Math.floor(window.app.renderer.rows * 0.8))
+                              window.app.currentDepthMap = window.app.converter.create3DDepthMap(emoji, emojiWidth, emojiHeight)
+                              window.app.currentShape = null
+                              window.app.uploadedImage = null
+                              window.app.rotation.setSpeed(1.0)
+                              window.app.transition.start()
+                            }
+                            setDrawerOpen(false)
+                          }}
+                        >
+                          {emoji}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Page Indicators */}
+              <div className="page-indicators">
+                {[0, 1, 2].map(page => (
+                  <button
+                    key={page}
+                    className={`page-indicator ${currentPage === page ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(page)}
+                  />
+                ))}
+              </div>
+
+              {/* Navigation Buttons */}
+              <div className="page-navigation">
+                <button
+                  className="nav-btn"
+                  onClick={() => setCurrentPage(Math.max(0, currentPage - 1))}
+                  disabled={currentPage === 0}
+                >
+                  ← Previous
+                </button>
+                <button
+                  className="nav-btn"
+                  onClick={() => setCurrentPage(Math.min(2, currentPage + 1))}
+                  disabled={currentPage === 2}
+                >
+                  Next →
+                </button>
+              </div>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
     </div>
   )
 }

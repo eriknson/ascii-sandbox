@@ -39,6 +39,8 @@ class GeometricShapes {
                 return this.createMandala(width, height);
             case 'wave':
                 return this.createWave(width, height);
+            case 'cube':
+                return this.createCursorCube(width, height);
             default:
                 return this.createCircle(width, height);
         }
@@ -477,6 +479,198 @@ class GeometricShapes {
         }
         
         return depthMap;
+    }
+    
+    /**
+     * Create Cursor logo cube - Full 3D rotating cube with all 6 sides
+     */
+    createCursorCube(width, height) {
+        const depthMap = [];
+        
+        // Initialize
+        for (let y = 0; y < height; y++) {
+            depthMap[y] = new Array(width).fill(0);
+        }
+        
+        const cx = width / 2;
+        const cy = height / 2;
+        const cubeSize = Math.min(width, height) * 0.35; // Bigger cube
+        
+        // Continuous rotation
+        const angleY = this.time * 0.8; // Rotate around Y axis
+        const angleX = Math.PI / 7;     // Slightly less tilt for better face visibility
+        
+        // Define all 8 vertices of the cube in 3D space
+        const vertices3D = [
+            [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],  // back
+            [-1, -1,  1], [1, -1,  1], [1, 1,  1], [-1, 1,  1]   // front
+        ];
+        
+        // Apply rotations
+        const cosY = Math.cos(angleY);
+        const sinY = Math.sin(angleY);
+        const cosX = Math.cos(angleX);
+        const sinX = Math.sin(angleX);
+        
+        const rotated = vertices3D.map(([x, y, z]) => {
+            // Rotate around Y axis
+            let xr = x * cosY - z * sinY;
+            let yr = y;
+            let zr = x * sinY + z * cosY;
+            
+            // Rotate around X axis
+            let xr2 = xr;
+            let yr2 = yr * cosX - zr * sinX;
+            let zr2 = yr * sinX + zr * cosX;
+            
+            return [xr2, yr2, zr2];
+        });
+        
+        // Project to 2D
+        const projected = rotated.map(([x, y, z]) => {
+            const scale = cubeSize;
+            const perspective = 4;
+            const factor = perspective / (perspective + z);
+            return [
+                cx + x * scale * factor,
+                cy + y * scale * factor,
+                z
+            ];
+        });
+        
+        // Define all 6 faces with their vertices
+        const faces = [
+            { name: 'front',  indices: [4, 5, 6, 7], color: 150 },
+            { name: 'back',   indices: [1, 0, 3, 2], color: 120 },
+            { name: 'top',    indices: [3, 2, 6, 7], color: 210 },
+            { name: 'bottom', indices: [0, 1, 5, 4], color: 100 },
+            { name: 'left',   indices: [0, 4, 7, 3], color: 85 },
+            { name: 'right',  indices: [1, 5, 6, 2], color: 67 }
+        ];
+        
+        // Calculate visibility and depth for each face
+        const visibleFaces = [];
+        
+        faces.forEach(face => {
+            const v0 = rotated[face.indices[0]];
+            const v1 = rotated[face.indices[1]];
+            const v2 = rotated[face.indices[2]];
+            
+            // Calculate face normal (cross product)
+            const edge1 = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]];
+            const edge2 = [v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]];
+            
+            const normal = [
+                edge1[1] * edge2[2] - edge1[2] * edge2[1],
+                edge1[2] * edge2[0] - edge1[0] * edge2[2],
+                edge1[0] * edge2[1] - edge1[1] * edge2[0]
+            ];
+            
+            // View direction (0, 0, 1) - camera looking down Z axis
+            const viewDot = normal[2];
+            
+            // Face is visible if normal points toward camera
+            // Use negative threshold to keep faces visible longer (prevents blinking)
+            if (viewDot > -0.1) {
+                const avgZ = face.indices.reduce((sum, i) => sum + rotated[i][2], 0) / 4;
+                
+                // Calculate opacity based on angle for smoother transitions
+                const opacity = Math.max(0, Math.min(1, (viewDot + 0.1) / 0.3));
+                
+                visibleFaces.push({
+                    name: face.name,
+                    indices: face.indices,
+                    color: face.color,
+                    depth: avgZ,
+                    opacity: opacity,
+                    points: face.indices.map(i => projected[i])
+                });
+            }
+        });
+        
+        // Sort by depth (back to front)
+        visibleFaces.sort((a, b) => a.depth - b.depth);
+        
+        // Render each visible face
+        visibleFaces.forEach(face => {
+            // Apply opacity to color for smoother transitions
+            const adjustedColor = Math.floor(face.color * face.opacity);
+            
+            // Draw base face
+            this.fillFace(depthMap, face.points, adjustedColor, width, height);
+            
+            // Add white triangle highlights for top and right faces
+            // (the iconic Cursor logo pattern)
+            if (face.name === 'top' && face.opacity > 0.5) {
+                // Right half white
+                const tri = [face.points[1], face.points[2], face.points[3]];
+                const whiteOpacity = Math.floor(255 * face.opacity);
+                this.fillFace(depthMap, tri, whiteOpacity, width, height);
+            }
+            
+            if (face.name === 'right' && face.opacity > 0.5) {
+                // Top half white
+                const tri = [face.points[0], face.points[1], face.points[2]];
+                const whiteOpacity = Math.floor(255 * face.opacity);
+                this.fillFace(depthMap, tri, whiteOpacity, width, height);
+            }
+        });
+        
+        return depthMap;
+    }
+    
+    /**
+     * Fill a face (quad or triangle)
+     */
+    fillFace(depthMap, pts, color, width, height) {
+        const minX = Math.max(0, Math.floor(Math.min(...pts.map(p => p[0]))));
+        const maxX = Math.min(width, Math.ceil(Math.max(...pts.map(p => p[0]))));
+        const minY = Math.max(0, Math.floor(Math.min(...pts.map(p => p[1]))));
+        const maxY = Math.min(height, Math.ceil(Math.max(...pts.map(p => p[1]))));
+        
+        for (let y = minY; y < maxY; y++) {
+            for (let x = minX; x < maxX; x++) {
+                if (pts.length === 3) {
+                    if (this.pointInTri(x, y, pts)) {
+                        depthMap[y][x] = color;
+                    }
+                } else {
+                    if (this.pointInQuad(x, y, pts)) {
+                        depthMap[y][x] = color;
+                    }
+                }
+            }
+        }
+    }
+    
+    /**
+     * Check if point is in quadrilateral
+     */
+    pointInQuad(x, y, pts) {
+        let inside = false;
+        for (let i = 0, j = 3; i < 4; j = i++) {
+            const xi = pts[i][0], yi = pts[i][1];
+            const xj = pts[j][0], yj = pts[j][1];
+            if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+                inside = !inside;
+            }
+        }
+        return inside;
+    }
+    
+    /**
+     * Check if point is in triangle
+     */
+    pointInTri(x, y, pts) {
+        let inside = false;
+        for (let i = 0, j = 2; i < 3; j = i++) {
+            const xi = pts[i][0], yi = pts[i][1];
+            const xj = pts[j][0], yj = pts[j][1];
+            if (((yi > y) !== (yj > y)) && (x < (xj - xi) * (y - yi) / (yj - yi) + xi)) {
+                inside = !inside;
+            }
+        }
+        return inside;
     }
     
     /**
