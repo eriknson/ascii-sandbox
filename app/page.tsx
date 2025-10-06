@@ -233,8 +233,8 @@ export default function Home() {
                 app.cameraActive = false
                 const cameraBtn = document.getElementById('camera-button')
                 if (cameraBtn) {
-                  cameraBtn.classList.remove('active')
-                  cameraBtn.textContent = 'Start Camera'
+                  cameraBtn.classList.remove('active', 'recording')
+                  cameraBtn.innerHTML = '<span class="emoji">📷</span>'
                 }
               }
               
@@ -259,8 +259,8 @@ export default function Home() {
           // Stop camera
           app.camera.stop()
           app.cameraActive = false
-          cameraButton.classList.remove('active')
-          cameraButton.textContent = 'Start Camera'
+          cameraButton.classList.remove('active', 'recording')
+          cameraButton.innerHTML = '<span class="emoji">📷</span>'
           
           // Return to emoji mode
           loadEmoji(app, app.currentEmoji)
@@ -272,8 +272,8 @@ export default function Home() {
             app.cameraActive = true
             app.currentShape = null
             app.uploadedImage = null
-            cameraButton.classList.add('active')
-            cameraButton.textContent = 'Stop Camera'
+            cameraButton.classList.add('active', 'recording')
+            cameraButton.innerHTML = '<span class="emoji">🔴</span>'
             
             // Clear emoji selection
             const allButtons = document.querySelectorAll('.emoji-btn')
@@ -297,8 +297,8 @@ export default function Home() {
               app.cameraActive = false
               const cameraBtn = document.getElementById('camera-button')
               if (cameraBtn) {
-                cameraBtn.classList.remove('active')
-                cameraBtn.textContent = 'Start Camera'
+                cameraBtn.classList.remove('active', 'recording')
+                cameraBtn.innerHTML = '<span class="emoji">📷</span>'
               }
             }
             
@@ -570,25 +570,40 @@ export default function Home() {
       {/* Floating Control Panel */}
       <div className="floating-controls">
         <div className="emoji-grid">
+          {/* Preset Emojis */}
           <button className="emoji-btn" data-emoji="🦋" data-key="1"><span className="emoji">🦋</span></button>
           <button className="emoji-btn" data-emoji="✨" data-key="2"><span className="emoji">✨</span></button>
           <button className="emoji-btn" data-emoji="🔥" data-key="3"><span className="emoji">🔥</span></button>
-          <button className="emoji-btn" data-emoji="💎" data-key="4"><span className="emoji">💎</span></button>
-          <button className="emoji-btn" data-emoji="❤️" data-key="5"><span className="emoji">❤️</span></button>
+          <button className="emoji-btn hide-on-mobile" data-emoji="💎" data-key="4"><span className="emoji">💎</span></button>
+          <button className="emoji-btn hide-on-mobile" data-emoji="❤️" data-key="5"><span className="emoji">❤️</span></button>
+          
+          {/* Divider */}
+          <div className="emoji-divider"></div>
+          
+          {/* Action Buttons */}
           <button 
-            className="emoji-btn more-emoji-btn" 
+            id="upload-button" 
+            className="emoji-btn action-btn" 
+            title="Upload image (U)"
+            data-key="U"
+          >
+            <span className="emoji">🖼️</span>
+          </button>
+          <button 
+            id="camera-button" 
+            className="emoji-btn action-btn" 
+            title="Start camera (C)"
+            data-key="C"
+          >
+            <span className="emoji">📷</span>
+          </button>
+          <button 
+            className="emoji-btn action-btn" 
             onClick={() => setDrawerOpen(true)}
+            title="More emojis"
             data-key="6"
           >
             <span className="emoji">➕</span>
-          </button>
-        </div>
-        <div className="button-row">
-          <button id="upload-button" className="upload-cta-full" title="Upload image (U)">
-            <span className="upload-text">Upload Image</span>
-          </button>
-          <button id="camera-button" className="camera-cta-full" title="Start camera (C)">
-            Start Camera
           </button>
         </div>
       </div>
